@@ -1,0 +1,44 @@
+version: "3.8"
+networks:
+  personal-network:
+    external: true
+services:
+  mongodb-service:
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - personal-network
+    hostname: mongodb-service
+    container_name: mongodb-service
+  
+  mongo-express:
+    image: mongo-express
+    restart: unless-stopped
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb-service
+      - ME_CONFIG_OPTIONS_EDITORTHEME=ambiance
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=password
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+    ports:
+      - 8081:8081
+    depends_on:
+      - mongodb-service
+    networks:
+      - personal-network
+    volumes:
+      - mongo_data
+    hostname: mongo-express
+    container_name: mongo-express
+
+volumes:
+  mongo_data:
