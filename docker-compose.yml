@@ -1,0 +1,30 @@
+version: "3.8"
+networks:
+  personal-network:
+    external: true
+services:
+  todo-service:
+    image: todo-service
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      - personal-network
+    hostname: todo-service
+    container_name: todo-service
+
+  todo-frontend:
+    image: todo-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - personal-network
+    depends_on: 
+      - todo-service
+    hostname: todo-frontend
+    container_name: todo-frontend

@@ -1,8 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
-import TodoView from './components/TodoListView';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+
+const socket = 'localhost:8080'
 
 function App() {
 
@@ -11,12 +13,12 @@ function App() {
     const [description, setDescription] = useState('')
 
     useEffect(() => {
-        axios.get('http://localhost:8001/api/todo')
+        axios.get(`http://${socket}/api/todo`)
             .then(res => setTodoList(res.data))
     });
 
     const addTodoHandler = () => {
-        axios.post('http://localhost:8001/api/todo', {'title': title, 'description': description})
+        axios.post(`http://${socket}/api/todo`, {'title': title, 'description': description})
             .then(res => console.log(res))
     }
 
@@ -55,6 +57,39 @@ function App() {
                 </div>
             </div>
             <h6 className="card text-dark bg-warning py-1 mb-0">Copyright 2021, All rights reserved &copy;</h6>
+        </div>
+    )
+}
+
+function TodoView(props) {
+    return (
+        <div>
+            <ul>
+                {props.todoList.map(todo => <TodoItem todo={todo}/>)}
+            </ul>
+        </div>
+    )
+}
+
+
+function TodoItem(props) {
+    const deleteTodoHandler = (title) => {
+        axios.delete(`http://${socket}/api/todo/${title}`)
+            .then(res => console.log(res.data))
+    }
+    return (
+        <div>
+            <p>
+                <span style={{fontWeight: 'bold, underline'}}>
+                    {props.todo.title} :
+                </span>
+                {props.todo.description}
+                <button onClick={() => deleteTodoHandler(props.todo.title)}
+                        className="btn btn-outline-danger my-2 mx-2"
+                        style={{'borderRadius': '50px'}}>
+                    X
+                </button>
+            </p>
         </div>
     )
 }
